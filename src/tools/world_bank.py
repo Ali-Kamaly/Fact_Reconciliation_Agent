@@ -21,4 +21,5 @@ def get_population(country_code):
         "last_updated": last_updated
     }
 
-print(get_population("BD"))
+#standardise using the ISO alpha-3 codes, both api and local database uses it
+print(get_population("BGD"))

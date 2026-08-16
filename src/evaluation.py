@@ -54,7 +54,7 @@ def check_provenance_independence(evidence_list):
         if len(evidence_group)>1
     }
 
-    return duplicates
+    return provenance_groups, duplicates
 
 def calculate_pairwise_percentage_diff(evidence_list):
     #evidence_list will always be relatively small so time complexity is irrelevant
@@ -100,7 +100,8 @@ def evaluate_evidence(evidence_list):
         })
 
     unknown_provenance_count = count_unknown_provenances(successful_evidence)
-    duplicate_provenances = check_provenance_independence(successful_evidence)
+    provenance_groups, duplicate_provenances = check_provenance_independence(successful_evidence)
+    unique_known_provenance_count = len(provenance_groups)
     pairwise_differences = calculate_pairwise_percentage_diff(successful_evidence)
 
     if pairwise_differences:
@@ -116,6 +117,7 @@ def evaluate_evidence(evidence_list):
         "source_ages": source_ages,
         "unknown_provenance_count": unknown_provenance_count,
         "duplicate_provenances": duplicate_provenances,
+        "unique_known_provenance_count": unique_known_provenance_count,
         "pairwise_differences": pairwise_differences,
         "max_pairwise_difference": max_pairwise_difference
     }

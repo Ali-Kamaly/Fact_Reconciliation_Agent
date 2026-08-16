@@ -1,5 +1,13 @@
 import pandas as pd
 
+LOCAL_RETRIEVAL_TYPE = "local_file"
+LOCAL_PUBLISHER = "Kaggle - World Population Dataset"
+#more review needed for kaggle provenance
+LOCAL_PROVENANCE = "World Population Review"
+LOCAL_URL = "https://www.kaggle.com/datasets/iamsouravbanerjee/world-population-dataset?resource=download"
+
+
+
 def get_local_population(country_code):
     pop_df = pd.read_csv("data/world_population.csv")
 
@@ -14,7 +22,7 @@ def get_local_population(country_code):
                 #removing 'World Population Percentage' col from population_years
                 pass
 
-    #making sure population years are in descending order
+    #ensuring population years are in descending order
     population_years.sort(key=lambda x: x[1], reverse= True)
 
     country_row = pop_df[pop_df['CCA3'] == country_code]
@@ -27,10 +35,18 @@ def get_local_population(country_code):
 
         if pd.notna(population):
             return {
+                    "retrieval_type": LOCAL_RETRIEVAL_TYPE,
                     "population": int(population),
                     "year": data_year,
+                    "publisher": LOCAL_PUBLISHER,
+                    "provenance": LOCAL_PROVENANCE,
+                    "url": LOCAL_URL,
+                    "last_updated": None,
+                    "status": "success",
+                    "error": None
             }
 
     return None
 
-print(get_local_population("BGD"))
+if __name__ == "__main__":
+    print(get_local_population("BGD"))

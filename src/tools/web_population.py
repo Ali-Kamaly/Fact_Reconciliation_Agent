@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 from anthropic import Anthropic
 import json
 
+WEB_RETRIEVAL_TYPE = "web_search"
+
 def get_web_population(country, excluded_urls = None):
     load_dotenv()
     client = Anthropic(api_key = os.getenv("ANTHROPIC_API_KEY"))
@@ -78,6 +80,11 @@ def get_web_population(country, excluded_urls = None):
     )
     web_evidence = json.loads(message.content[-1].text)
     #-1 since web search contains messages of tools used etc. which are irrelevant
+
+    web_evidence["retrieval_type"] = WEB_RETRIEVAL_TYPE
+    web_evidence["last_updated"] = None
+    web_evidence["status"] = "success"
+    web_evidence["error"] = None
 
     return web_evidence
 

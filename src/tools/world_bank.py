@@ -8,29 +8,58 @@ API_URL = "https://api.worldbank.org/v2/"
 
 def get_wb_population(country_code):
     url = f"https://api.worldbank.org/v2/country/{country_code}/indicator/SP.POP.TOTL"
-    response = requests.get(
-        url,
-        params = {"format": "json"}
-    ).json()
 
-    last_updated = response[0]['lastupdated']
-    #making sure latest valid population value is found
-    for record in response[1]:
-        if record['value'] is not None:
-            population = int(record['value'])
-            year = int(record['date'])
-            break
+    try:
+        response = requests.get(url, params = {"format": "json"}, timeout=5)
+        response.raise_for_status()
+        data = response.json()
 
+        last_updated = data[0]['lastupdated']
+        #making sure latest valid population value is found
+        population = None
+        year = None
+        for record in data[1]:
+            if record['value'] is not None:
+                population = int(record['value'])
+                year = int(record['date'])
+                break
+
+        if population is None:
+            raise ValueError("No valid population data returned")
+
+        return {
+            "retrieval_type": API_RETRIEVAL_TYPE,
+            "population": population,
+            "year": year,
+            "publisher": API_PUBLISHER,
+            "provenance": API_PROVENANCE,
+            "url": API_URL,
+            "last_updated": last_updated,
+            "status": "success",
+            "error": None
+        }
+
+    except requests.Timeout:
+        return failed_wb_request("API took too long")
+
+    except requests.RequestException as error:
+        return failed_wb_request(str(error))
+
+    except ValueError as error:
+        return failed_wb_request(str(error))
+
+
+def failed_wb_request(error_message):
     return {
-        "retrieval_type": API_RETRIEVAL_TYPE,
-        "population": population,
-        "year": year,
-        "publisher": API_PUBLISHER,
-        "provenance": API_PROVENANCE,
-        "url": API_URL,
-        "last_updated": last_updated,
-        "status": "success",
-        "error": None
+            "retrieval_type": API_RETRIEVAL_TYPE,
+            "population": None,
+            "year": None,
+            "publisher": API_PUBLISHER,
+            "provenance": API_PROVENANCE,
+            "url": API_URL,
+            "last_updated": None,
+            "status": "failed",
+            "error": error_message
     }
 
 if __name__ == "__main__":

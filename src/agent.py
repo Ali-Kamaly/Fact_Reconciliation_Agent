@@ -46,13 +46,14 @@ def run_agent(country_name, country_code):
     #adaptive phase
     while retrieval_count<MAX_RETRIEVAL_COUNT:
 
-        action = choose_next_action(evidence_list, attempt_counts, evaluation, retrieval_count)
+        decision = choose_next_action(evidence_list, attempt_counts, evaluation, retrieval_count)
+        action, reason = decision['action'], decision['reason']
 
         if action == 'finish':
+            print(f"[AGENT]:\nAction: {action}\nReason: {reason}")
             break
 
         #agent will retry same source only one other time before skipping it if both times retrieval fails
-        #removed increment retrieval_count here
         if action == 'local_file':
             result = get_local_population(country_code)
             
@@ -65,6 +66,7 @@ def run_agent(country_name, country_code):
             if result['url']:
                 excluded_urls.append(result['url'])
 
+        print(f"[AGENT]:\nAction: {action}\nReason: {reason}")
         evidence_list.append(result)
 
         retrieval_count +=1
@@ -77,6 +79,7 @@ def run_agent(country_name, country_code):
     }
 
 def evidence_is_sufficient(evaluation):
+    #add reasons later
     if evaluation['successful_source_count'] <3:
         return False
     if evaluation['unique_known_provenance_count'] < 3:
@@ -95,19 +98,37 @@ def choose_next_action(evidence_list, attempt_counts, evaluation, retrieval_coun
     successful_types = [evidence["retrieval_type"] for evidence in evidence_list if evidence["status"] == "success"]
 
     if retrieval_count>=MAX_RETRIEVAL_COUNT:
-        return 'finish'
+        return {
+            "action": "finish",
+            "reason": "max retrieval count reached"
+        }
 
     if 'local_file' not in successful_types and attempt_counts['local_file'] < MAX_SOURCE_ATTEMPTS: 
-        return 'local_file'
+        return {
+            "action": "local_file",
+            "reason": "initial local file retrieval failed"
+        }
 
     if 'api' not in successful_types and attempt_counts['api'] < MAX_SOURCE_ATTEMPTS:
-        return 'api'
+        return {
+            "action": "api",
+            "reason": "initial api retrieval failed"
+            }
 
     if 'web_search' not in successful_types and attempt_counts['web_search'] < MAX_SOURCE_ATTEMPTS:
-        return 'web_search'
+        return {
+            "action": "web_search",
+            "reason": "initial web search retrieval failed"
+            }
 
     if evidence_is_sufficient(evaluation):
-        return 'finish'
+        return {
+        "action": "finish",
+        "reason": "evidence is sufficient"
+    }
 
-    return 'web_search'
+    return {
+        "action": "web_search",
+        "reason": "current evidence is insufficient"
+    }
     

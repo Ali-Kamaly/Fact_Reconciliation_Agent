@@ -2,13 +2,12 @@ from tools.local_population import get_local_population
 from tools.web_population import get_web_population
 from tools.world_bank import get_wb_population
 from evaluation import evaluate_evidence
-
-MAX_RETRIEVAL_COUNT = 5
-MAX_SOURCE_ATTEMPTS = 2
-#purely huristic max acceptable disagreement
-MAX_ACCEPTABLE_DISAGREEMENT = 7.5
-MAX_RECENT_AGE = 1
-
+from config import (
+    MAX_RETRIEVAL_COUNT,
+    MAX_SOURCE_ATTEMPTS,
+    MAX_ACCEPTABLE_DISAGREEMENT,
+    MAX_RECENT_AGE
+)
 
 #implement a way to retrieve country_code from csv from country_name
 def run_agent(country_name, country_code):

@@ -105,7 +105,6 @@ def evaluate_source_quality(evidence):
             "quality": "high",
             "reason": "Known authoritative institutional population-data source"
             }
-
     if (
         "bureau of statistics" in provenance or "national statistics" in provenance
         or "population division" in provenance or "united nations" in provenance

@@ -8,6 +8,7 @@ from config import (
     MAX_ACCEPTABLE_DISAGREEMENT,
     MAX_RECENT_AGE
 )
+from reconciliation import reconcile_evidence
 
 #implement a way to retrieve country_code from csv from country_name
 def run_agent(country_name, country_code):
@@ -79,7 +80,10 @@ def run_agent(country_name, country_code):
     else:
         print(f"[AGENT]\nAction: Finish\nReason: Max retrieval count of {MAX_RETRIEVAL_COUNT} has been reached")
 
+    final_answer = reconcile_evidence(country_name, evidence_list, evaluation)
+
     return {
+        "answer": final_answer,
         "evidence": evidence_list,
         "evaluation": evaluation
     }
@@ -142,4 +146,6 @@ def choose_next_action(evidence_list, attempt_counts, evaluation):
     }
 
 if __name__ == '__main__':
-    print(run_agent("Bangladesh", "BGD"))
+    result = run_agent("Bangladesh", "BGD")
+    print(result["answer"])
+    print(result['answer']['explanation'])

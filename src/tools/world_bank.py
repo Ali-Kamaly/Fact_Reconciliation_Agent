@@ -42,11 +42,14 @@ def get_wb_population(country_code):
     except requests.Timeout:
         return failed_wb_request("API took too long")
 
-    except requests.RequestException as error:
-        return failed_wb_request(str(error))
+    except requests.RequestException:
+        return failed_wb_request("World Bank API request failed")
 
     except ValueError as error:
         return failed_wb_request(str(error))
+
+    except KeyError:
+        return failed_wb_request(f"Invalid country code entered: {country_code}")
 
 
 def failed_wb_request(error_message):
@@ -65,3 +68,4 @@ def failed_wb_request(error_message):
 if __name__ == "__main__":
     #standardise using the ISO alpha-3 codes, both api and local database uses it
     print(get_wb_population("BGD"))
+    print(get_wb_population("Bangladesh"))

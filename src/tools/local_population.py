@@ -77,3 +77,4 @@ def failed_local_request(error_message):
 
 if __name__ == "__main__":
     print(get_local_population("BGD"))
+    print(get_local_population("XYZ"))

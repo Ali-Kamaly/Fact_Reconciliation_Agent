@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 import anthropic
-#from anthropic import Anthropic
 import json
 
 WEB_RETRIEVAL_TYPE = "web_search"

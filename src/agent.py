@@ -10,7 +10,6 @@ from config import (
 )
 from reconciliation import reconcile_evidence
 
-#implement a way to retrieve country_code from csv from country_name
 def run_agent(country_name, country_code):
     evidence_list = []
     excluded_urls = []
@@ -89,7 +88,6 @@ def run_agent(country_name, country_code):
     }
 
 def evidence_is_sufficient(evaluation):
-    #add reasons later
     if evaluation['successful_source_count'] <3:
         return False
     if evaluation['unique_known_provenance_count'] < 3:

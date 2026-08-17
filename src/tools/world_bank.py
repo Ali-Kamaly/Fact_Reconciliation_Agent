@@ -65,7 +65,3 @@ def failed_wb_request(error_message):
             "error": error_message
     }
 
-if __name__ == "__main__":
-    #standardise using the ISO alpha-3 codes, both api and local database uses it
-    print(get_wb_population("BGD"))
-    print(get_wb_population("Bangladesh"))

@@ -240,5 +240,3 @@ def evaluate_evidence(evidence_list):
         "max_pairwise_difference": max_pairwise_difference
     }
 
-if __name__ == "__main__":
-    ...

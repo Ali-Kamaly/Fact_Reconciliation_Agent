@@ -164,6 +164,3 @@ def generate_final_explanation(country_name, best_evidence, confidence, evidence
             f"Confidence is {confidence}. "
             "A detailed semantic explanation could not be generated."
         )
-
-if __name__ == '__main__':
-    ...

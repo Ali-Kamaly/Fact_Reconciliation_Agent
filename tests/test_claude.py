@@ -20,8 +20,6 @@ def test_claude_link():
     )
     return message.content[0].text
 
-#print(test_claude_link())
-
 def test_claude_web():
     message = client.messages.create(
         model = "claude-haiku-4-5",
@@ -45,5 +43,3 @@ def test_claude_web():
 
     )
     return message
-
-print(test_claude_web())

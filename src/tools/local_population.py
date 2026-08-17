@@ -2,7 +2,6 @@ import pandas as pd
 
 LOCAL_RETRIEVAL_TYPE = "local_file"
 LOCAL_PUBLISHER = "Kaggle - World Population Dataset"
-#more review needed for kaggle provenance
 LOCAL_PROVENANCE = "World Population Review"
 LOCAL_URL = "https://www.kaggle.com/datasets/iamsouravbanerjee/world-population-dataset?resource=download"
 

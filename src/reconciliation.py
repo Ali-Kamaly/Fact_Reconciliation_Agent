@@ -133,6 +133,13 @@ def generate_final_explanation(country_name, best_evidence, confidence, evidence
     shared or duplicate provenance.
     Do not change the selected population value.
     Do not change the confidence level.
+    Do not claim that a difference is caused by a difference in reference
+    year or methodology. You may state that differing years make the values
+    less directly comparable.
+
+    Do not infer whether a value is an estimate, projection, census, or
+    observed figure unless that information is explicitly present in the
+    supplied evidence.
     Do not introduce facts that are not present in the supplied evidence.
     Keep the explanation concise. Keep the explanation under 120 words.
     """

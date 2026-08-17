@@ -4,6 +4,7 @@ from config import (
     MAX_RECENT_AGE
 )
 
+#intentionally not using precise probabilit
 def calculate_confidence(evaluation):
     successful_count = evaluation["successful_source_count"]
     unique_provenances = evaluation["unique_known_provenance_count"]

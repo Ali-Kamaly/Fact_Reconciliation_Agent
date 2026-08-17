@@ -1,4 +1,6 @@
 from datetime import datetime
+from dotenv import load_dotenv
+import anthropic, os, json
 
 def get_successful_evidence(evidence_list):
     return [evidence for evidence in evidence_list if evidence['status'] == 'success']
@@ -86,6 +88,111 @@ def calculate_pairwise_percentage_diff(evidence_list):
 
     return percentage_differences
 
+def evaluate_source_quality(evidence):
+    publisher = (evidence['publisher'] or "").strip().lower()
+    provenance = (evidence['provenance'] or "").strip().lower()
+
+    #shouldn't ideally happen
+    if publisher == "" and provenance == "":
+        return {
+            "quality" : "unknown",
+            "reason": "No data available on publisher nor provenance"
+        }
+
+    #obvious known sources
+    if "world bank" in publisher or "world bank" in provenance:
+        return {
+            "quality": "high",
+            "reason": "Known authoritative institutional population-data source"
+            }
+
+    if (
+        "bureau of statistics" in provenance or "national statistics" in provenance
+        or "population division" in provenance or "united nations" in provenance
+    ):
+        return {
+            "quality": "high",
+            "reason": "Underlying provenance is an official or authoritative statistical source"
+        }
+    
+    if "kaggle" in publisher or "wikipedia" in publisher: 
+        return {
+            "quality": "medium",
+            "reason": "Secondary dataset distribution platform"
+            }
+
+    #only after deterministic checks use Claude
+    return classify_source_quality_with_claude(evidence)
+
+def classify_source_quality_with_claude(evidence):
+    try:
+        load_dotenv()
+        client = anthropic.Anthropic(api_key = os.getenv("ANTHROPIC_API_KEY"), timeout=15.0)
+
+        prompt = f"""
+        You are evaluating source quality for country population statistics.
+
+        Classify the evidence into exactly one of:
+
+        high:
+        - official national statistics agency
+        - intergovernmental/statistical institution producing or directly publishing population data
+        - primary authoritative population-data source
+
+        medium:
+        - established secondary source or aggregator
+        - reputable publisher clearly citing an authoritative underlying source
+
+        unknown:
+        - authority cannot be confidently determined
+        - provenance is missing or unclear
+        - source does not fit the above categories
+
+        Publisher: {evidence['publisher']}
+        Underlying provenance: {evidence['provenance']}
+
+        Judge the quality of the EVIDENCE SOURCE, not whether the population number itself is correct.
+        """
+
+        message = client.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens = 150,
+            messages =[
+                {"role": "user",
+                 "content": prompt
+                }
+            ],
+            output_config={
+                "format": {
+                    "type": "json_schema",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "quality": {
+                                "type": "string",
+                                "enum": ["high", "medium", "unknown"]
+                            },
+                            "reason": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "quality",
+                            "reason"
+                        ],
+                        "additionalProperties": False
+                    }
+                }
+            }
+        )
+
+        return json.loads(message.content[0].text)
+    except anthropic.AnthropicError:
+        return {
+            "quality": "unknown",
+            "reason": "Source quality classification unavailable"
+        }
+
 def evaluate_evidence(evidence_list):
     successful_evidence = get_successful_evidence(evidence_list)
 
@@ -93,16 +200,27 @@ def evaluate_evidence(evidence_list):
     failed_source_count = len(evidence_list) - successful_source_count
 
     source_ages = []
+    source_qualities = []
+
     for evidence in successful_evidence:
         source_ages.append({
             "publisher": evidence['publisher'],
             "age": get_data_age(evidence)
         })
+        quality_result = evaluate_source_quality(evidence)
+        source_qualities.append({
+            "publisher": evidence['publisher'],
+            "provenance": evidence['provenance'],
+            "quality": quality_result['quality'],
+            "reason": quality_result['reason']
+        })
+
 
     unknown_provenance_count = count_unknown_provenances(successful_evidence)
     provenance_groups, duplicate_provenances = check_provenance_independence(successful_evidence)
     unique_known_provenance_count = len(provenance_groups)
     pairwise_differences = calculate_pairwise_percentage_diff(successful_evidence)
+
 
     if pairwise_differences:
         max_pairwise_difference = max(
@@ -115,6 +233,7 @@ def evaluate_evidence(evidence_list):
         "successful_source_count": successful_source_count,
         "failed_source_count": failed_source_count,
         "source_ages": source_ages,
+        "source_qualities": source_qualities,
         "unknown_provenance_count": unknown_provenance_count,
         "duplicate_provenances": duplicate_provenances,
         "unique_known_provenance_count": unique_known_provenance_count,

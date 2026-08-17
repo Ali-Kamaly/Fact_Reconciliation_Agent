@@ -111,7 +111,3 @@ def failed_web_request(error_message):
         "error": error_message
     }
 
-
-if __name__ == "__main__":
-    print(get_web_population("Bangladesh"))
-    print(get_web_population("Bangladesh", excluded_urls=['https://www.worldometers.info/world-population/bangladesh-population/']))

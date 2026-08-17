@@ -142,8 +142,3 @@ def choose_next_action(evidence_list, attempt_counts, evaluation):
             "remain within source retry limits"
         )
     }
-
-if __name__ == '__main__':
-    result = run_agent("Bangladesh", "BGD")
-    print(result["answer"])
-    print(result['answer']['explanation'])

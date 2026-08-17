@@ -89,7 +89,3 @@ def get_country_code(country_name):
 
     except (FileNotFoundError, pd.errors.ParserError, KeyError):
         return None
-
-if __name__ == "__main__":
-    print(get_local_population("BGD"))
-    print(get_local_population("XYZ"))

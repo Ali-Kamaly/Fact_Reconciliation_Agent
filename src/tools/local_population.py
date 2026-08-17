@@ -75,6 +75,22 @@ def failed_local_request(error_message):
         "error": error_message
     }
 
+def get_country_code(country_name):
+    try:
+        pop_df = pd.read_csv("data/world_population.csv")
+
+        country_row = pop_df[
+            pop_df["Country/Territory"].str.lower() == country_name.strip().lower()
+        ]
+
+        if country_row.empty:
+            return None
+
+        return country_row["CCA3"].iloc[0]
+
+    except (FileNotFoundError, pd.errors.ParserError, KeyError):
+        return None
+
 if __name__ == "__main__":
     print(get_local_population("BGD"))
     print(get_local_population("XYZ"))

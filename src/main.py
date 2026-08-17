@@ -1,24 +1,33 @@
-from tools.local_population import get_local_population
-from tools.world_bank import get_wb_population
-from tools.web_population import get_web_population
-from evaluation import evaluate_evidence
+from agent import run_agent
+from tools.local_population import get_country_code
 
 def main():
-    local = get_local_population("BGD")
-    api = get_wb_population("BGD")
-    web = get_web_population("BGD")
+    country_name = input("Enter a country: ").strip()
+    country_code = get_country_code(country_name)
 
-    print(local)
-    print(api)
-    print(web)
+    if country_code is None:
+        print(f"Country {country_name} is not found")
+        return None
+    
+    result = run_agent(country_name, country_code)
+    answer = result["answer"]
 
-    print(local.keys())
-    print(api.keys())
-    print(web.keys())
+    if answer['population'] is None:
+        print("\n=== Final Answer ===")
+        print(f"Country: {answer['country']}")
+        print("Population: unavailable")
+        print(f"Confidence: {answer['confidence']}")
+        print(f"\n{answer['explanation']}")
+        return
 
-    evidence_list = [local, api, web]
-
-    print(evaluate_evidence(evidence_list))
+    print("\n=== Final Answer ===")
+    print(f"Country: {answer['country']}")
+    print(f"Population: {answer['population']:,}")
+    print(f"Year: {answer['year']}")
+    print(f"Source: {answer['publisher']}")
+    print(f"Source quality: {answer['source_quality']}")
+    print(f"Confidence: {answer['confidence']}")
+    print(f"\n{answer['explanation']}")
 
 if __name__ == "__main__":
     main()

@@ -129,6 +129,8 @@ def generate_final_explanation(country_name, best_evidence, confidence, evidence
     Do not add qualitative claims such as "gold-standard", "normal",
     "industry-standard", or methodological explanations unless those are
     explicitly supported by the supplied data.
+    Do not describe sources as independent if the evaluation reports
+    shared or duplicate provenance.
     Do not change the selected population value.
     Do not change the confidence level.
     Do not introduce facts that are not present in the supplied evidence.

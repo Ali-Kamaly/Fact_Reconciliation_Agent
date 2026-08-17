@@ -3,8 +3,15 @@ from config import (
     HIGH_DISAGREEMENT,
     MAX_RECENT_AGE
 )
+from evaluation import get_successful_evidence
 
-#intentionally not using precise probabilit
+QUALITY_RANK = {
+    "high": 2,
+    "medium": 1,
+    "unknown": 0
+}
+
+#intentionally not using precise probability
 def calculate_confidence(evaluation):
     successful_count = evaluation["successful_source_count"]
     unique_provenances = evaluation["unique_known_provenance_count"]
@@ -30,3 +37,45 @@ def calculate_confidence(evaluation):
         return "medium"
 
     return "high"
+
+def choose_best_evidence(evidence_list, evaluation):
+    #successful evidence only
+    #- highest source quality wins
+    #- if quality ties, freshest year wins
+
+    successful_evidence = get_successful_evidence(evidence_list)
+
+    if not successful_evidence:
+        return None
+
+    best_evidence = successful_evidence[0]
+
+    for evidence in successful_evidence[1:]:
+        current_quality = get_evidence_quality(evidence, evaluation)
+        best_quality = get_evidence_quality(best_evidence, evaluation)
+
+        if QUALITY_RANK[current_quality] > QUALITY_RANK[best_quality]:
+            best_evidence = evidence
+
+        elif (
+            QUALITY_RANK[current_quality] == QUALITY_RANK[best_quality]
+            and evidence["year"] > best_evidence["year"]
+        ):
+            best_evidence = evidence
+
+    return best_evidence
+
+def get_evidence_quality(evidence, evaluation):
+    #finds corresponding entry in source_qualities
+    for quality_info in evaluation["source_qualities"]:
+        if (
+            quality_info["publisher"] == evidence["publisher"]
+            and quality_info["provenance"] == evidence["provenance"]
+        ):
+            return quality_info["quality"]
+
+    return "unknown"
+
+
+if __name__ == '__main__':
+    ...

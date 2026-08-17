@@ -6,16 +6,6 @@ The system queries three distinct retrieval paths - a local population dataset, 
 
 This project was built for the **LEC AI Engineering Intern build assessment**.
 
----
-
-## Demo
-
-**Video:** _Add public demo link here_
-
-The demo shows the agent running end to end, including a scenario where a source is unavailable or returns unusable evidence and the agent adapts its retrieval strategy.
-
----
-
 ## What the agent does
 
 Given a country name, the program:
